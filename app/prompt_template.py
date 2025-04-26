@@ -1,13 +1,29 @@
-# from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
 import chroma_wrap
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
-from langchain_ollama import OllamaLLM
+# from langchain_ollama import OllamaLLM
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.core import Settings
 
-llm = OllamaLLM(model="mistral", base_url="http://host.docker.internal:11434")
-print("Imported Chroma wrap")
+
+from dotenv import load_dotenv
+import os
+import openai
+from pathlib import Path
+
+# Load environment variables from the .env file
+# Load env manually
+env_path = Path(__file__).parent.parent / '.env'  # One level up from app/
+load_dotenv(dotenv_path=env_path)
+
+
+
+# Get OpenAI API key from environment variable
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# llm = OllamaLLM(model="mistral", base_url="http://host.docker.internal:11434")
+# print("Imported Chroma wrap")
 # Prompt for Chain-of-Thought RAG
 prompt_template = PromptTemplate.from_template("""
 You are a scientific reasoning assistant.
@@ -39,10 +55,11 @@ answer the question. Provide the answer in a valid JSON format.
 
 {question}
 
-## Output format
-~Question:~
+~Context:~
+{context}
 
-User query given to you
+## Output format
+Give me a valid JSON format with the following information.
 
 ~Answer:~
 
@@ -60,7 +77,7 @@ Did you really use the chunks provided to you to generate the response. Yes or N
 """)
 
 # Wrap OpenAI LLM
-# llm = ChatOpenAI(model="gpt-4", temperature=0.2)
+llm = ChatOpenAI(model="gpt-4", temperature=0.2,openai_api_key=openai.api_key)
 
 
 Settings.llm = llm
@@ -94,7 +111,7 @@ def answer_query(question: str):
 
     # Extract content from nodes to form the context for the model
     context = "\n\n".join([n.node.get_content() for n in nodes])
-    print(context)
+    # print(context)
     # Prepare the final answer with LangChain
     final_answer = llm_chain.invoke({
         "question": question,

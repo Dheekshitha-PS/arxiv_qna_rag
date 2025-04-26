@@ -9,13 +9,13 @@ services:
     container_name: arxiv_qa_app
     environment:
       - CHROMA_DB_DIR=/app/chroma_store
-      - OLLAMA_BASE_URL=http://ollama:11434
+      - OPENAI_API_KEY=${OPENAI_API_KEY}  # Use the environment variable for OpenAI API key
     volumes:
       - ./app:/app
       - ./chroma_storage:/app/chroma_store
     depends_on:
       - chromadb
-      - ollama
+
     command: [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000", "--reload" ]
     networks:
       - arxiv_net
@@ -28,21 +28,6 @@ services:
     volumes:
       - ./chroma_storage:/chroma/chroma
     restart: unless-stopped
-    networks:
-      - arxiv_net
-
-  ollama:
-    build:
-      context: ./ollama
-      dockerfile: Dockerfile
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
-      interval: 10s
-      retries: 5
     networks:
       - arxiv_net
 
