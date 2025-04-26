@@ -39,6 +39,9 @@ answer the question. Provide the answer in a valid JSON format.
 
 {question}
 
+~Context:~
+{context}
+
 ## Output format
 ~Question:~
 
