@@ -1,0 +1,47 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+
+# === Environment ===
+.env
+*.env
+
+# === ChromaDB ===
+app/chroma/
+app/chroma_storage/
+
+# === Ollama ===
+ollama/.ollama/
+
+# Ignore all PDFs
+*.pdf
+
+# Ignore crash dumps
+*.stackdump
+
+# Ignore previously committed PDFs inside app/pdfs/
+app/pdfs/
+
+# Ignore database files
+*.sqlite3
+*.bin
+
+# === VSCode / IDEs ===
+.vscode/
+.idea/
+
+# === Docker ===
+*.log
+docker-compose.override.yml
+
+# === Jupyter Notebooks (if any) ===
+.ipynb_checkpoints/
+
+# === OS / System files ===
+.DS_Store
+Thumbs.db
+
