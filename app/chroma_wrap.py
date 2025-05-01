@@ -33,3 +33,8 @@ def get_index():
         Settings.embed_model =embed_model
         _index = VectorStoreIndex.from_vector_store(get_vector_store(),embed_model=embed_model)
     return _index
+
+def delete_session(session_id):
+
+    chroma_collection.delete(where = {"session_id": session_id})
+

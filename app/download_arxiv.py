@@ -48,3 +48,15 @@ def download_pdfs(paper):
 
     except Exception as e:
         print(f"Failed for {url}: {e}")
+
+def load_pdfs(pdf_path,arxiv_id,title):
+    # Main pipeline
+
+
+    try:
+
+        chunks = pdfconverter.semantic_chunking(text='',path=pdf_path)
+        return chunks
+
+    except Exception as e:
+        print(f"Failed for {title}: {e}")

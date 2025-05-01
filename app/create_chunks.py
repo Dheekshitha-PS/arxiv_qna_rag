@@ -1,3 +1,5 @@
+import datetime
+
 import get_arxiv_files  # Script to fetch arxiv files metadata
 import download_arxiv  # Script to download PDFs
 import pdfconverter  # Script for PDF to markdown parsing and chunking
@@ -90,11 +92,51 @@ def process_all_papers(categories,MAX_RESULTS):
         store_sections_chromadb(arxiv_id, sections, title, abstract, published_date)
     return len(all_papers)
 
-# process_all_papers()
-# papers = get_documents_from_chromadb()
-# ids = papers['ids']
-# results = test_collection()
-# print("Query results Count:", results)
-#
-# print(ids)
-#
+def process_uploaded_paper(path,session_id,filename,p,date):
+
+
+
+    # Retrieve paper metadata and full text from ChromaDB
+    arxiv_id = str(session_id)+'_'+str(p)
+
+    title = filename
+    abstract = ""
+
+    sections = download_arxiv.load_pdfs(path,arxiv_id,title)
+
+    store_uploaded_pdf_chunks(arxiv_id, sections, title,date,session_id)
+
+
+    print(f"Chunked and stored  {filename}")
+
+# def fetch_and_process_arxiv(arxiv_id,session_id):
+
+
+def store_uploaded_pdf_chunks(paper_id, sections, title, upload_date,session_id):
+
+    i =0
+    try:
+
+
+        # Iterate over the extracted chunks and store them in ChromaDB
+        for chunk in sections:
+            i +=1
+            chunk_title = f"{title}"  # You can modify this as needed
+            chunk_id = f"{paper_id}_section_{i}"  # Ensure unique ID for each chunk
+            embedding= get_embedding(chunk)
+            # Store each chunk in ChromaDB
+            paper_collection.add(
+                documents=[chunk],  # Chunk content
+                metadatas=[{
+                    "arxiv_id": chunk_id,
+                    "title": title,
+
+                    "section": "",
+                    "published_date":upload_date,
+                    "session_id":session_id
+                }],
+                ids=[chunk_id],embeddings=embedding
+            )
+            # print(f"Stored chunk: {chunk_title}")
+    except Exception as e:
+        print(f"Error processing paper with ID {paper_id}: {e}")

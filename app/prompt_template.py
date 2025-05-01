@@ -5,6 +5,11 @@ from langchain.chains import LLMChain
 # from langchain_ollama import OllamaLLM
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.core import Settings
+from llama_index.core.vector_stores import (
+    MetadataFilter,
+    MetadataFilters,
+    FilterOperator,
+)
 
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from dotenv import load_dotenv
@@ -89,20 +94,24 @@ Settings.llm = llm
 # llm_chain = LLMChain(llm=llm, prompt=prompt_template)
 llm_chain = prompt_template | llm | output_parser
 
-def answer_query(question: str):
+def answer_query(question: str,filters=  ''   ):
     # Retrieve the index and prepare the query engine
 
 
     index = chroma_wrap.get_index()
 
-    # query_engine = index.as_query_engine(similarity_top_k=5)
-    # llama_response = query_engine.query(question)
-    # print("QUERY ENGINE RESPONSE")
-    #
-    # print(llama_response)
-    # # Extract relevant source nodes
-    # nodes = llama_response.source_nodes
-    retriever = index.as_retriever(similarity_top_k=5)
+    print(filters)
+
+    if filters:
+        meta_filters = MetadataFilters(
+            filters=[
+                MetadataFilter(key="session_id", value=filters['session_id'])
+                # MetadataFilter(key="title", value=filters['title'][0])
+            ]
+        )
+        retriever = index.as_retriever(similarity_top_k=5,filters=meta_filters)
+    else:
+        retriever = index.as_retriever(similarity_top_k=5)
     nodes = retriever.retrieve(question)
     # for i, node in enumerate(nodes):
     #     print(f"\n--- Chunk {i + 1} ---\n{node.text}")

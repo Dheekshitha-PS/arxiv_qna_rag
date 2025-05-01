@@ -26,3 +26,5 @@ llama-index-llms-langchain
 fastapi
 uvicorn
 python-dotenv
+python-multipart
+uuid

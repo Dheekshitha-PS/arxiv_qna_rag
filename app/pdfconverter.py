@@ -9,7 +9,10 @@ def count_tokens(text, model_name="gpt-3.5-turbo"):
     return len(enc.encode(text))
 
 
-def semantic_chunking(text, max_tokens=1000, model_name="gpt-3.5-turbo"):
+
+def semantic_chunking(text,path='', max_tokens=1000, model_name="gpt-3.5-turbo"):
+    if path:
+        text = pymupdf4llm.to_markdown(path)
     splitter = SentenceSplitter(language='en')
     sentences = splitter.split(text)
     enc = tiktoken.encoding_for_model(model_name)
@@ -19,7 +22,16 @@ def semantic_chunking(text, max_tokens=1000, model_name="gpt-3.5-turbo"):
     current_tokens = 0
 
     for sentence in sentences:
+        sentence = sentence.strip()
+        if not sentence:
+            continue  # Skip empty strings
         token_count = len(enc.encode(sentence))
+
+        if token_count > max_tokens:
+            # If a single sentence is too large, just break it off
+            chunks.append(sentence)
+            continue
+
         if current_tokens + token_count > max_tokens:
             chunks.append(" ".join(current_chunk))
             current_chunk = [sentence]
@@ -32,6 +44,7 @@ def semantic_chunking(text, max_tokens=1000, model_name="gpt-3.5-turbo"):
         chunks.append(" ".join(current_chunk))
 
     return chunks
+
 
 
 def format_chunk(title, abstract, section_name, content,category,published_date):
@@ -92,7 +105,7 @@ def extract_sections_from_markdown(pdf_path, title, abstract,category,published_
         tokens = count_tokens(full_text)
 
         if tokens > 1000:
-            chunks = semantic_chunking(full_text)
+            chunks = semantic_chunking(text=full_text)
             for i, chunk in enumerate(chunks):
                 section_key = f"{section}_part_{i + 1}"
                 processed_sections[section_key] = [
