@@ -6,7 +6,7 @@ from langchain.chains import LLMChain
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.core import Settings
 
-
+from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from dotenv import load_dotenv
 import os
 import openai
@@ -24,6 +24,19 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # llm = OllamaLLM(model="mistral", base_url="http://host.docker.internal:11434")
 # print("Imported Chroma wrap")
+
+response_schemas = [
+    ResponseSchema(name="answer", description="Your answer to the user's question. Give a detailed response"),
+    ResponseSchema(
+        name="source",
+        description="What are the chunks used from the source chunks provided to you",
+    ),
+
+]
+output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+
+format_instructions = output_parser.get_format_instructions()
+
 # Prompt for Chain-of-Thought RAG
 prompt_template = PromptTemplate.from_template("""
 You are a scientific reasoning assistant.
@@ -61,30 +74,20 @@ answer the question. Provide the answer in a valid JSON format.
 ## Output format
 Give me a valid JSON format with the following information.
 
-~Answer:~
-
-Your answer to the user's question. Give a detailed response
-
-~Source used:~
-
-What are the chunks used from the source chunks provided to you
-
-~Confirmation~
-
-Did you really use the chunks provided to you to generate the response. Yes or No
+{format_instructions}
 
 
 """)
 
 # Wrap OpenAI LLM
-llm = ChatOpenAI(model="gpt-4", temperature=0.2,openai_api_key=openai.api_key)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2,openai_api_key=openai.api_key)
 
 
 Settings.llm = llm
 
 # Wrap in a LangChain
 # llm_chain = LLMChain(llm=llm, prompt=prompt_template)
-llm_chain = prompt_template | llm
+llm_chain = prompt_template | llm | output_parser
 
 def answer_query(question: str):
     # Retrieve the index and prepare the query engine
@@ -115,13 +118,14 @@ def answer_query(question: str):
     # Prepare the final answer with LangChain
     final_answer = llm_chain.invoke({
         "question": question,
-        "context": context
+        "context": context,
+        "format_instructions":format_instructions
     })
 
     # You can also append citations to the final answer if desired
     # citations = "\n".join([f"- {node.node.metadata.get('arxiv_id')} | {node.node.metadata.get('title')} | {node.node.metadata.get('published_date')}" for node in nodes])
     # final_answer += "\n\nCitations:\n" + citations
 
-    print("And the final answer from LLM is: ")
-    print(final_answer)
+
+    # print(final_answer)
     return final_answer

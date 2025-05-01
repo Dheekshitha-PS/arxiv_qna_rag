@@ -14,9 +14,16 @@ def read_root():
 def ask(question: str = Query(description="Question to ask the system")):
     try:
         answer = answer_query(question)
+        print("And the final answer from LLM is: ")
+
+        print(answer.keys())
 
 
-        return {"question": question, "answer": answer}
+        final_dict= {"question": question,"answer":answer}
+
+
+
+        return final_dict
     except Exception as e:
         return {"error": str(e)}
 
