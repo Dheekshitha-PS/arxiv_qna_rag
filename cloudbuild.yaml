@@ -19,9 +19,12 @@ steps:
       - 'managed'
       - '--port'
       - '8080'
+      - '--timeout'
+      - '1000s'
       - '--memory'
       - '1Gi'
       - '--allow-unauthenticated'
+      
 
 images:
   - 'gcr.io/$PROJECT_ID/arxivqna:$COMMIT_SHA'
