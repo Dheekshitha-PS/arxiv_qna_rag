@@ -12,9 +12,17 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Pre-download the Hugging Face model during build time to avoid runtime download
-RUN python -c "from transformers import AutoModel, AutoTokenizer; \
-               AutoModel.from_pretrained('BAAI/bge-base-en-v1.5'); \
-               AutoTokenizer.from_pretrained('BAAI/bge-base-en-v1.5')"
+# Set the environment variable for HF cache directory
+ENV HF_HOME=/app/.cache/huggingface
+
+# Create the directory explicitly
+RUN mkdir -p /app/.cache/huggingface
+
+# Pre-download model and tokenizer into this directory
+RUN python -c "\
+from transformers import AutoModel, AutoTokenizer; \
+AutoTokenizer.from_pretrained('BAAI/bge-base-en-v1.5', cache_dir='/app/.cache/huggingface'); \
+AutoModel.from_pretrained('BAAI/bge-base-en-v1.5', cache_dir='/app/.cache/huggingface')"
 
 # Copy the rest of the application files
 COPY . .
