@@ -9,9 +9,8 @@ import chromadb
 from transformers import AutoTokenizer, AutoModel
 import torch
 
-tokenizer = AutoTokenizer.from_pretrained("BAAI/bge-base-en-v1.5")
-model = AutoModel.from_pretrained("BAAI/bge-base-en-v1.5")
-
+tokenizer = AutoTokenizer.from_pretrained("BAAI/bge-base-en-v1.5", local_files_only=True)
+model = AutoModel.from_pretrained("BAAI/bge-base-en-v1.5", local_files_only=True)
 def get_embedding(text):
     # Instruction format for better retrieval performance
     instruction = "Represent this paragraph from a research paper for retrieval: "
