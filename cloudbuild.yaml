@@ -1,9 +1,8 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/arxivqna:$COMMIT_SHA', '-f', 'app/Dockerfile', 'app']
-    secretEnv: ['OPENAI_API_KEY']  # Declared here
-    env:
-      - 'OPENAI_API_KEY=${OPENAI_API_KEY}'  # Referenced here
+    secretEnv: ['OPENAI_API_KEY']  # ✅ This makes OPENAI_API_KEY available
+
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/arxivqna:$COMMIT_SHA']
 
@@ -26,14 +25,15 @@ steps:
       - '--memory'
       - '1Gi'
       - '--allow-unauthenticated'
-      - --set-secrets=OPENAI_API_KEY=OPENAI_API_KEY:latest
+      - '--set-secrets=OPENAI_API_KEY=OPENAI_API_KEY:latest'
 
 images:
   - 'gcr.io/$PROJECT_ID/arxivqna:$COMMIT_SHA'
 
 options:
   logging: CLOUD_LOGGING_ONLY
+
 availableSecrets:
   secretManager:
-    - versionName: projects/arxivqna/secrets/OPENAI_API_KEY/versions/latest
+    - versionName: 'projects/arxivqna/secrets/OPENAI_API_KEY/versions/latest'
       env: 'OPENAI_API_KEY'
