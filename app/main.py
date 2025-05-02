@@ -15,7 +15,7 @@ port = int(os.environ.get("PORT", 8080))
 
 app = FastAPI()
 session_store = {}
-active_sessions = set()
+active_sessions = {}
 
 @app.get("/")
 def read_root():
@@ -109,9 +109,9 @@ def close_session(session_id: str):
     except Exception as e:
         print(f"Error deleting papers in  {session_id}: {e}")
 
-@app.on_event("shutdown")
-def shutdown_event():
-    chroma_wrap.delete_session(active_sessions['session_id'])
+# @app.on_event("shutdown")
+# def shutdown_event():
+#     chroma_wrap.delete_session(active_sessions['session_id'])
 
 
 if __name__ == "__main__":
