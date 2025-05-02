@@ -19,13 +19,24 @@ from pathlib import Path
 
 # Load environment variables from the .env file
 # Load env manually
-env_path = Path(__file__).parent.parent / '.env'  # One level up from app/
-load_dotenv(dotenv_path=env_path)
+# Try to get from environment first (for Cloud Run)
+api_key = os.getenv("OPENAI_API_KEY")
 
+# If not found, try loading from .env (for local dev)
+if not api_key:
+    from dotenv import load_dotenv
+    env_path = Path(__file__).parent.parent / '.env'
+    load_dotenv(dotenv_path=env_path)
+    api_key = os.getenv("OPENAI_API_KEY")
 
+# Set globally for OpenAI and validate
+if not api_key:
+    raise ValueError("Missing OPENAI_API_KEY. Set it as env var or in .env file.")
+
+openai.api_key = api_key
 
 # Get OpenAI API key from environment variable
-openai.api_key = os.getenv("OPENAI_API_KEY")
+#  = os.getenv("OPENAI_API_KEY")
 
 # llm = OllamaLLM(model="mistral", base_url="http://host.docker.internal:11434")
 # print("Imported Chroma wrap")

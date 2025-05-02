@@ -24,10 +24,14 @@ steps:
       - '--memory'
       - '1Gi'
       - '--allow-unauthenticated'
-      
+      - --set-secrets=OPENAI_API_KEY=OPENAI_API_KEY:latest
 
 images:
   - 'gcr.io/$PROJECT_ID/arxivqna:$COMMIT_SHA'
 
 options:
   logging: CLOUD_LOGGING_ONLY
+availableSecrets:
+  secretManager:
+    - versionName: projects/arxivqna/secrets/OPENAI_API_KEY/versions/latest
+      env: 'OPENAI_API_KEY'
