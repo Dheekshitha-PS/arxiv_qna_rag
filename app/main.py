@@ -9,6 +9,10 @@ from uuid import uuid4
 import uuid
 from datetime import date
 import chroma_wrap
+import os
+
+port = int(os.environ.get("PORT", 8080))
+
 app = FastAPI()
 session_store = {}
 active_sessions = set()
@@ -108,3 +112,8 @@ def close_session(session_id: str):
 @app.on_event("shutdown")
 def shutdown_event():
     chroma_wrap.delete_session(active_sessions['session_id)'])
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
