@@ -7,6 +7,8 @@ from llama_index.core import Settings
 # embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-base-en-v1.5")
 
 
+CACHE_DIR = "/app/.cache/huggingface"
+
 
 
 
@@ -29,7 +31,7 @@ def get_index():
     global _index
     if _index is None:
 
-        embed_model    = HuggingFaceEmbedding(model_name="BAAI/bge-base-en-v1.5")
+        embed_model    = HuggingFaceEmbedding(model_name="BAAI/bge-base-en-v1.5",   cache_folder=CACHE_DIR)
         Settings.embed_model =embed_model
         _index = VectorStoreIndex.from_vector_store(get_vector_store(),embed_model=embed_model)
     return _index
