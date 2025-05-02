@@ -111,7 +111,7 @@ def close_session(session_id: str):
 
 @app.on_event("shutdown")
 def shutdown_event():
-    chroma_wrap.delete_session(active_sessions['session_id)'])
+    chroma_wrap.delete_session(active_sessions['session_id'])
 
 
 if __name__ == "__main__":
