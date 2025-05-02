@@ -1,6 +1,7 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/arxivqna:$COMMIT_SHA', '-f', 'app/Dockerfile', 'app']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/arxivqna:$COMMIT_SHA', '-f', 'app/Dockerfile', '.']
+
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
